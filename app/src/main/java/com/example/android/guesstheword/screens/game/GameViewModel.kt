@@ -7,10 +7,14 @@ import androidx.lifecycle.ViewModel
 
 class GameViewModel : ViewModel() {
 
+    // Event which triggers the end of the game
+    private val _eventGameFinish = MutableLiveData<Boolean>()
+    val eventGameFinish: LiveData<Boolean>
+        get() = _eventGameFinish
+
     // The current word
     private val _word = MutableLiveData<String>()
-    var word : LiveData<String> = _word
-
+    var word: LiveData<String> = _word
 
     // The current score
     private val _score = MutableLiveData<Int>()
@@ -39,7 +43,7 @@ class GameViewModel : ViewModel() {
      * Moves to the next word in the list
      */
 
-    fun resetList() {
+    private fun resetList() {
         wordList = mutableListOf(
                 "queen",
                 "hospital",
@@ -66,11 +70,10 @@ class GameViewModel : ViewModel() {
         wordList.shuffle()
     }
 
-    fun nextWord() {
-        if (!wordList.isEmpty()) {
-            //Select and remove a word from the list
-            _word.value = wordList.removeAt(0)
-        }
+    private fun nextWord() {
+        if (wordList.isEmpty()) onGameFinish()
+        //Select and remove a _word from the list
+        else _word.value = wordList.removeAt(0)
     }
 
     fun onSkip() {
@@ -81,5 +84,16 @@ class GameViewModel : ViewModel() {
     fun onCorrect() {
         _score.value = score.value?.plus(1)
         nextWord()
+    }
+
+    /** Method for the game completed event **/
+   private fun onGameFinish() {
+        _eventGameFinish.value = true
+    }
+
+    /** Method for the game completed event **/
+
+    fun onGameFinishComplete() {
+        _eventGameFinish.value = false
     }
 }

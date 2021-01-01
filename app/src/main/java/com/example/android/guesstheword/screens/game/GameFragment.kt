@@ -56,12 +56,17 @@ class GameFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 
         /** Setting up LiveData observation relationship **/
-        viewModel.score.observe(viewLifecycleOwner, Observer { newScore ->
+        viewModel.score.observe(viewLifecycleOwner, { newScore ->
             binding.scoreText.text = newScore.toString()
         })
 
-        viewModel.word.observe(viewLifecycleOwner, Observer { newWord ->
+        viewModel.word.observe(viewLifecycleOwner, { newWord ->
             binding.wordText.text = newWord
+        })
+
+        //Observe if eventGameFinish is true
+        viewModel.eventGameFinish.observe(viewLifecycleOwner, { hasFinished ->
+            if (hasFinished) gameFinished()
         })
 
         binding.correctButton.setOnClickListener { onCorrect() }
@@ -92,5 +97,6 @@ class GameFragment : Fragment() {
         val action = GameFragmentDirections.actionGameToScore()
         action.score = viewModel.score.value?:0
         NavHostFragment.findNavController(this).navigate(action)
+        viewModel.onGameFinishComplete()
     }
 }
